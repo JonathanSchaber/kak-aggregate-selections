@@ -2,9 +2,14 @@
 
 This module provides simple arithmetic aggregation functions to apply on selections in the Kakoune editor.
 
+It consists of the function `aggregate-selections`, which is globally aliased to `agg`.
+
+The computations are carried out by GNU `bc`, so make sure your shell provides this program.
+
+
 ## Setup
 
-Add `src/aggregate_selections.kak` to your `autoload/` directory, or copy the contents of the file to your `kakrc`directly.
+Add `src/aggregate_selections.kak` to your `autoload/` directory, or copy the contents of the file to your `kakrc` directly.
 
 
 ## Usage
