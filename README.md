@@ -16,4 +16,4 @@ Add `src/aggregate_selections.kak` to your `autoload/` directory, or copy the co
 
 Select the numbers you want to aggregate and apply the needed function by invoking `agg` with the respective argument (to compute e.g. the sum of all selected numbers, type `:agg sum`).
 
-The result will be shown in the info widget and is also sotred in the `r` register.
+The result will be shown in the info widget and is also stored in the `r` register.
