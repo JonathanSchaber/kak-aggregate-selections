@@ -10,47 +10,76 @@ aggregate-selections -params 1 %{
     eval %sh{
         case $1 in
             sum)
+                prefix="sum: "
                 eval set -- "$kak_quoted_selections"
-                res=$( echo $* | sed 's/ /+/g' | bc )
+                res=0
+                for el in "$@"; do
+                    el=$( echo "$el" | sed 's/[^0123456789,]//' )
+                    res=$( echo "$res + $el" | bc )
+                done
                 ;;
             prod)
+                prefix="product: "
                 eval set -- "$kak_quoted_selections"
-                res=$( echo $* | sed 's/ /*/g' | bc )
+                res=1
+                for el in "$@"; do
+                    el=$( echo "$el" | sed 's/[^0123456789,]//' )
+                    res=$( echo "$res * $el" | bc )
+                done
                 ;;
             mean)
+                prefix="mean: "
                 eval set -- "$kak_quoted_selections"
                 nargs=$#
-                sum=$( echo $* | sed 's/ /+/g' | bc )
+                sum=0
+                for el in "$@"; do
+                    el=$( echo "$el" | sed 's/[^0123456789,]//' )
+                    sum=$( echo "$sum + $el" | bc )
+                done
                 res=$( echo "scale=3; $sum / $nargs" | bc )
                 ;;
             max)
+                prefix="max: "
                 eval set -- "$kak_quoted_selections"
                 IFS=$'\n'
                 res=$( echo "$*" | sort -nr | head -n1 )
                 ;;
             min)
+                prefix="min: "
                 eval set -- "$kak_quoted_selections"
                 IFS=$'\n'
                 res=$( echo "$*" | sort -n | head -n1 )
                 ;;
             stdv)
+                prefix="standard deviation: "
                 eval set -- "$kak_quoted_selections"
                 nargs=$#
                 delta_sum=0
-                sum=$( echo $* | sed 's/ /+/g' | bc )
+                sum=0
+                for el in "$@"; do
+                    el=$( echo "$el" | sed 's/[^0123456789,]//' )
+                    sum=$( echo "$sum + $el" | bc )
+                done
                 mean=$( echo "scale=3; $sum / $nargs" | bc )
-                for el in $*; do
+                for el in "$@"; do
+                    el=$( echo "$el" | sed 's/[^0123456789,]//' )
                     delta_sum=$( echo "$delta_sum + ($el - $mean)^2" | bc )
                 done
                 res=$( echo "scale=3; sqrt($delta_sum / $nargs)" | bc )
                 ;;
             var)
+                prefix="variance: "
                 eval set -- "$kak_quoted_selections"
                 nargs=$#
                 delta_sum=0
-                sum=$( echo $* | sed 's/ /+/g' | bc )
+                sum=0
+                for el in "$@"; do
+                    el=$( echo "$el" | sed 's/[^0123456789,]//' )
+                    sum=$( echo "$sum + $el" | bc )
+                done
                 mean=$( echo "scale=3; $sum / $nargs" | bc )
-                for el in $*; do
+                for el in "$@"; do
+                    el=$( echo "$el" | sed 's/[^0123456789,]//' )
                     delta_sum=$( echo "$delta_sum + ($el - $mean)^2" | bc )
                 done
                 res=$( echo "scale=3; $delta_sum / $nargs" | bc )
@@ -59,6 +88,7 @@ aggregate-selections -params 1 %{
                 echo "fail unknown aggregation function" && exit 1
                 ;;
         esac
+        res=$prefix$( echo $res | sed 's/-/‐/' )
         printf "info -title result '%-8s'\n" "$res"
         printf "reg 'r' %s\n" "$res"
     }
