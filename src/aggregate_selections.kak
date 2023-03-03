@@ -14,7 +14,7 @@ aggregate-selections -params 1 %{
                 eval set -- "$kak_quoted_selections"
                 res=0
                 for el in "$@"; do
-                    el=$( echo "$el" | sed 's/[^0123456789,]//' )
+                    el=$( echo "$el" | sed 's/[^0123456789,]//g' )
                     res=$( echo "$res + $el" | bc )
                 done
                 ;;
@@ -23,7 +23,7 @@ aggregate-selections -params 1 %{
                 eval set -- "$kak_quoted_selections"
                 res=1
                 for el in "$@"; do
-                    el=$( echo "$el" | sed 's/[^0123456789,]//' )
+                    el=$( echo "$el" | sed 's/[^0123456789,]//g' )
                     res=$( echo "$res * $el" | bc )
                 done
                 ;;
@@ -33,7 +33,7 @@ aggregate-selections -params 1 %{
                 nargs=$#
                 sum=0
                 for el in "$@"; do
-                    el=$( echo "$el" | sed 's/[^0123456789,]//' )
+                    el=$( echo "$el" | sed 's/[^0123456789,]//g' )
                     sum=$( echo "$sum + $el" | bc )
                 done
                 res=$( echo "scale=3; $sum / $nargs" | bc )
@@ -57,12 +57,12 @@ aggregate-selections -params 1 %{
                 delta_sum=0
                 sum=0
                 for el in "$@"; do
-                    el=$( echo "$el" | sed 's/[^0123456789,]//' )
+                    el=$( echo "$el" | sed 's/[^0123456789,]//g' )
                     sum=$( echo "$sum + $el" | bc )
                 done
                 mean=$( echo "scale=3; $sum / $nargs" | bc )
                 for el in "$@"; do
-                    el=$( echo "$el" | sed 's/[^0123456789,]//' )
+                    el=$( echo "$el" | sed 's/[^0123456789,]//g' )
                     delta_sum=$( echo "$delta_sum + ($el - $mean)^2" | bc )
                 done
                 res=$( echo "scale=3; sqrt($delta_sum / $nargs)" | bc )
@@ -74,12 +74,12 @@ aggregate-selections -params 1 %{
                 delta_sum=0
                 sum=0
                 for el in "$@"; do
-                    el=$( echo "$el" | sed 's/[^0123456789,]//' )
+                    el=$( echo "$el" | sed 's/[^0123456789,]//g' )
                     sum=$( echo "$sum + $el" | bc )
                 done
                 mean=$( echo "scale=3; $sum / $nargs" | bc )
                 for el in "$@"; do
-                    el=$( echo "$el" | sed 's/[^0123456789,]//' )
+                    el=$( echo "$el" | sed 's/[^0123456789,]//g' )
                     delta_sum=$( echo "$delta_sum + ($el - $mean)^2" | bc )
                 done
                 res=$( echo "scale=3; $delta_sum / $nargs" | bc )
