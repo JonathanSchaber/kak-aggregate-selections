@@ -91,7 +91,7 @@ aggregate-selections -params ..1 %{
                 ;;
         esac
         res=$( echo $res | sed 's/-/‐/' )
-        printf "info -title 'result (rounded' '%-15s %.3f'\n" "$prefix" "$res"
+        printf "info -title 'result (rounded)' '%-15s %.3f'\n" "$prefix" "$res"
         printf "reg 'r' %s\n" "$res"
     }
 }
