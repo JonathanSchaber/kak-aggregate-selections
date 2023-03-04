@@ -38,7 +38,7 @@ aggregate-selections -params ..1 %{
                     el=$( echo "$el" | sed 's/[^0123456789.]//g' )
                     sum=$( echo "$sum + $el" | bc )
                 done
-                res=$( echo "scale=3; $sum / $nargs" | bc )
+                res=$( echo "$sum / $nargs" | bc -l )
                 ;;
             max)
                 prefix="max: "
@@ -62,12 +62,12 @@ aggregate-selections -params ..1 %{
                     el=$( echo "$el" | sed 's/[^0123456789.]//g' )
                     sum=$( echo "$sum + $el" | bc )
                 done
-                mean=$( echo "scale=3; $sum / $nargs" | bc )
+                mean=$( echo "$sum / $nargs" | bc -l )
                 for el in "$@"; do
                     el=$( echo "$el" | sed 's/[^0123456789.]//g' )
                     delta_sum=$( echo "$delta_sum + ($el - $mean)^2" | bc )
                 done
-                res=$( echo "scale=3; sqrt($delta_sum / $nargs)" | bc )
+                res=$( echo "sqrt($delta_sum / $nargs)" | bc -l )
                 ;;
             var)
                 prefix="variance: "
@@ -79,19 +79,19 @@ aggregate-selections -params ..1 %{
                     el=$( echo "$el" | sed 's/[^0123456789.]//g' )
                     sum=$( echo "$sum + $el" | bc )
                 done
-                mean=$( echo "scale=3; $sum / $nargs" | bc )
+                mean=$( echo "$sum / $nargs" | bc -l )
                 for el in "$@"; do
                     el=$( echo "$el" | sed 's/[^0123456789.]//g' )
                     delta_sum=$( echo "$delta_sum + ($el - $mean)^2" | bc )
                 done
-                res=$( echo "scale=3; $delta_sum / $nargs" | bc )
+                res=$( echo "$delta_sum / $nargs" | bc -l )
                 ;;
             *)
                 echo "fail unknown aggregation function" && exit 1
                 ;;
         esac
-        res=$prefix$( echo $res | sed 's/-/‐/' )
-        printf "info -title result '%-8s'\n" "$res"
+        res=$( echo $res | sed 's/-/‐/' )
+        printf "info -title 'result (rounded' '%-15s %.3f'\n" "$prefix" "$res"
         printf "reg 'r' %s\n" "$res"
     }
 }
