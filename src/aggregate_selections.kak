@@ -90,9 +90,14 @@ aggregate-selections -params ..1 %{
                 echo "fail unknown aggregation function" && exit 1
                 ;;
         esac
+
+        # normal minus sign gets interpreted as argument
+        # for the 'reg'/info commands by kakoune
         res=$( echo $res | sed 's/-/‐/' )
-        printf "info -title 'result (rounded)' '%-15s %.3f'\n" "$prefix" "$res"
         printf "reg 'r' %s\n" "$res"
+
+        [[ "$res" =~ \. ]] && res=$( printf "%.3f" "$res" )
+        printf "info -title 'result (rounded)' '%s %+15s'\n" "$prefix" "${res%%0*}"
     }
 }
 
