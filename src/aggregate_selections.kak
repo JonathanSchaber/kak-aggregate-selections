@@ -10,6 +10,8 @@ compute some arithmetic aggregations of the selections
 if the function is invoked without specifying a parameter, it defaults to 'sum'" \
 aggregate-selections -params ..1 %{
     eval %sh{
+        [ $kak_selection_count -eq 1 ] && { echo "fail 'only 1 selection - nothing to aggregate'"; exit 1; }
+
         case ${1:-sum} in
             sum)
                 prefix="sum: "
