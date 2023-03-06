@@ -43,14 +43,28 @@ aggregate-selections -params ..1 %{
             max)
                 prefix="max: "
                 eval set -- "$kak_quoted_selections"
-                IFS=$'\n'
-                res=$( echo "$*" | sort -nr | head -n1 )
+                res=
+                for el in "$@"; do
+                    el=$( echo "$el" | sed 's/[^0123456789.\-]//g' )
+                    if [ -z $res ]; then
+                        res=$el
+                    else
+                        [ $( echo "$el > $res" | bc ) -eq 1 ] && res=$el
+                    fi
+                done
                 ;;
             min)
                 prefix="min: "
                 eval set -- "$kak_quoted_selections"
-                IFS=$'\n'
-                res=$( echo "$*" | sort -n | head -n1 )
+                res=
+                for el in "$@"; do
+                    el=$( echo "$el" | sed 's/[^0123456789.\-]//g' )
+                    if [ -z $res ]; then
+                        res=$el
+                    else
+                        [ $( echo "$el < $res" | bc ) -eq 1 ] && res=$el
+                    fi
+                done
                 ;;
             stdv)
                 prefix="standard deviation: "
