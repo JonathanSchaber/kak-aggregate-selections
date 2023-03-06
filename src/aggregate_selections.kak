@@ -109,7 +109,7 @@ aggregate-selections -params ..1 %{
 
         printf "reg 'r' %s\n" "$res"
 
-        [[ "$res" =~ \. ]] && res=$( printf "%.3f" "$res" | sed 's/0+$//' )
+        [[ "$res" =~ \. ]] && res=$( printf "%.3f" "$res" | sed -E 's/0+$//' )
         printf "info -title 'result (rounded)' '\n%s %+15s'\n" "$prefix" "$res"
     }
 }
