@@ -92,12 +92,12 @@ aggregate-selections -params ..1 %{
         esac
 
         # normal minus sign gets interpreted as argument
-        # for the 'reg'/info commands by kakoune
+        # for the 'reg'/'info' commands by kakoune
         res=$( echo $res | sed 's/-/‐/' )
         printf "reg 'r' %s\n" "$res"
 
-        [[ "$res" =~ \. ]] && res=$( printf "%.3f" "$res" )
-        printf "info -title 'result (rounded)' '%s %+15s'\n" "$prefix" "${res%%0*}"
+        [[ "$res" =~ \. ]] && res=$( printf "%.3f" "$res" | sed 's/0+$//' )
+        printf "info -title 'result (rounded)' '\n%s %+15s'\n" "$prefix" "$res"
     }
 }
 
