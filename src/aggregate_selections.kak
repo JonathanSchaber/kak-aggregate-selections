@@ -16,7 +16,7 @@ aggregate-selections -params ..1 %{
                 eval set -- "$kak_quoted_selections"
                 res=0
                 for el in "$@"; do
-                    el=$( echo "$el" | sed 's/[^0123456789.]//g' )
+                    el=$( echo "$el" | sed 's/[^0123456789.\-]//g' )
                     res=$( echo "$res + $el" | bc )
                 done
                 ;;
@@ -25,7 +25,7 @@ aggregate-selections -params ..1 %{
                 eval set -- "$kak_quoted_selections"
                 res=1
                 for el in "$@"; do
-                    el=$( echo "$el" | sed 's/[^0123456789.]//g' )
+                    el=$( echo "$el" | sed 's/[^0123456789.\-]//g' )
                     res=$( echo "$res * $el" | bc )
                 done
                 ;;
@@ -35,7 +35,7 @@ aggregate-selections -params ..1 %{
                 nargs=$#
                 sum=0
                 for el in "$@"; do
-                    el=$( echo "$el" | sed 's/[^0123456789.]//g' )
+                    el=$( echo "$el" | sed 's/[^0123456789.\-]//g' )
                     sum=$( echo "$sum + $el" | bc )
                 done
                 res=$( echo "$sum / $nargs" | bc -l )
@@ -59,12 +59,12 @@ aggregate-selections -params ..1 %{
                 delta_sum=0
                 sum=0
                 for el in "$@"; do
-                    el=$( echo "$el" | sed 's/[^0123456789.]//g' )
+                    el=$( echo "$el" | sed 's/[^0123456789.\-]//g' )
                     sum=$( echo "$sum + $el" | bc )
                 done
                 mean=$( echo "$sum / $nargs" | bc -l )
                 for el in "$@"; do
-                    el=$( echo "$el" | sed 's/[^0123456789.]//g' )
+                    el=$( echo "$el" | sed 's/[^0123456789.\-]//g' )
                     delta_sum=$( echo "$delta_sum + ($el - $mean)^2" | bc )
                 done
                 res=$( echo "sqrt($delta_sum / $nargs)" | bc -l )
@@ -76,12 +76,12 @@ aggregate-selections -params ..1 %{
                 delta_sum=0
                 sum=0
                 for el in "$@"; do
-                    el=$( echo "$el" | sed 's/[^0123456789.]//g' )
+                    el=$( echo "$el" | sed 's/[^0123456789.\-]//g' )
                     sum=$( echo "$sum + $el" | bc )
                 done
                 mean=$( echo "$sum / $nargs" | bc -l )
                 for el in "$@"; do
-                    el=$( echo "$el" | sed 's/[^0123456789.]//g' )
+                    el=$( echo "$el" | sed 's/[^0123456789.\-]//g' )
                     delta_sum=$( echo "$delta_sum + ($el - $mean)^2" | bc )
                 done
                 res=$( echo "$delta_sum / $nargs" | bc -l )
@@ -93,10 +93,9 @@ aggregate-selections -params ..1 %{
 
         # normal minus sign gets interpreted as argument
         # for the 'reg'/'info' commands by kakoune
-        res=$( echo $res | sed 's/-/‐/' )
-        printf "reg 'r' %s\n" "$res"
+        printf "reg 'r' %s\n" "$( echo $res | sed 's/-/‐/' )"
 
-        [[ "$res" =~ \. ]] && res=$( printf "%.3f" "$res" | sed 's/0+$//' )
+        [[ "$res" =~ \. ]] && res=$( printf "%.3f" "$res" | sed 's/0+$//' | sed 's/-/‐/' )
         printf "info -title 'result (rounded)' '\n%s %+15s'\n" "$prefix" "$res"
     }
 }
