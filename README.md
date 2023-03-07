@@ -36,5 +36,5 @@ to evaluate selected numbers/expressions, `aggregate-selections`
 removes all characters which are **not** a number, a `.`, or one
 of the operators `+`, `-`, `*`, `/`, `^`. Therefore, you don't
 need to pedanticly crop your selections or remove 10k-separators
-not processable by `bc` (`,`, `\``, ' ' and the like).
+not processable by `bc` (`,`, `'`, ` ` and the like).
 
