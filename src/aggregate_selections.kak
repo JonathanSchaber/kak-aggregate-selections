@@ -12,14 +12,16 @@ aggregate-selections -params ..1 %{
     eval %sh{
         [ $kak_selection_count -eq 1 ] && { echo "fail 'only 1 selection - nothing to aggregate'"; exit 1; }
 
+        del="[\-+*/.0123456789\n]"
+
         case ${1:-sum} in
             sum)
                 prefix="sum: "
                 eval set -- "$kak_quoted_selections"
                 res=0
                 for el in "$@"; do
-                    el=${el//[!0-9.\-]/}
-                    res=$( printf "%s + %s\n" $res $el | bc )
+                    el=$( printf "%s\n" "$el" | tr -cd $del )
+                    res=$( printf "%s + %s\n" $res "($el)" | bc -l )
                 done
                 ;;
             prod)
@@ -27,8 +29,8 @@ aggregate-selections -params ..1 %{
                 eval set -- "$kak_quoted_selections"
                 res=1
                 for el in "$@"; do
-                    el=${el//[!0-9.\-]/}
-                    res=$( printf "%s * %s\n" $res $el | bc )
+                    el=$( printf "%s\n" "$el" | tr -cd $del )
+                    res=$( printf "%s * %s\n" $res "($el)" | bc -l )
                 done
                 ;;
             mean)
@@ -37,8 +39,8 @@ aggregate-selections -params ..1 %{
                 nargs=$#
                 sum=0
                 for el in "$@"; do
-                    el=${el//[!0-9.\-]/}
-                    sum=$( printf "%s + %s\n" $sum $el | bc )
+                    el=$( printf "%s\n" "$el" | tr -cd $del )
+                    sum=$( printf "%s + %s\n" $sum "($el)" | bc -l )
                 done
                 res=$( printf "%s / %s\n" $sum $nargs | bc -l )
                 ;;
@@ -47,11 +49,11 @@ aggregate-selections -params ..1 %{
                 eval set -- "$kak_quoted_selections"
                 res=
                 for el in "$@"; do
-                    el=${el//[!0-9.\-]/}
+                    el=$( printf "%s\n" "$el" | tr -cd $del )
                     if [ -z $res ]; then
-                        res=$el
+                        res=$( printf "%s\n" "$el" | bc -l )
                     else
-                        [ $( printf "%s > %s\n" $el $res | bc ) -eq 1 ] && res=$el
+                        [ $( printf "%s > %s\n" "($el)" $res | bc -l ) -eq 1 ] && res=$( printf "%s\n" "$el" | bc -l )
                     fi
                 done
                 ;;
@@ -60,11 +62,11 @@ aggregate-selections -params ..1 %{
                 eval set -- "$kak_quoted_selections"
                 res=
                 for el in "$@"; do
-                    el=${el//[!0-9.\-]/}
+                    el=$( printf "%s\n" "$el" | tr -cd $del )
                     if [ -z $res ]; then
-                        res=$el
+                        res=$( printf "%s\n" "$el" | bc -l )
                     else
-                        [ $( printf "%s < %s\n" $el $res | bc ) -eq 1 ] && res=$el
+                        [ $( printf "%s < %s\n" "($el)" $res | bc -l ) -eq 1 ] && res=$( printf "%s\n" "$el" | bc -l )
                     fi
                 done
                 ;;
@@ -75,13 +77,13 @@ aggregate-selections -params ..1 %{
                 delta_sum=0
                 sum=0
                 for el in "$@"; do
-                    el=${el//[!0-9.\-]/}
-                    sum=$( printf "%s + %s\n" $sum $el | bc )
+                    el=$( printf "%s\n" "$el" | tr -cd $del )
+                    sum=$( printf "%s + %s\n" $sum "($el)" | bc -l )
                 done
                 mean=$( printf "%s / %s\n" $sum $nargs | bc -l )
                 for el in "$@"; do
-                    el=${el//[!0-9.\-]/}
-                    delta_sum=$( printf "%s + (%s - %s)^2\n" $delta_sum $el $mean | bc )
+                    el=$( printf "%s\n" "$el" | tr -cd $del )
+                    delta_sum=$( printf "%s + (%s - %s)^2\n" $delta_sum "($el)" $mean | bc -l )
                 done
                 res=$( printf "%s / %s\n" $delta_sum $nargs | bc -l )
                 ;;
@@ -92,13 +94,13 @@ aggregate-selections -params ..1 %{
                 delta_sum=0
                 sum=0
                 for el in "$@"; do
-                    el=${el//[!0-9.\-]/}
-                    sum=$( printf "%s + %s\n" $sum $el | bc )
+                    el=$( printf "%s\n" "$el" | tr -cd $del )
+                    sum=$( printf "%s + %s\n" $sum "($el)" | bc -l )
                 done
                 mean=$( printf "%s / %s\n" $sum $nargs | bc -l )
                 for el in "$@"; do
-                    el=${el//[!0-9.\-]/}
-                    delta_sum=$( printf "%s + (%s - %s)^2\n" $delta_sum $el $mean | bc )
+                    el=$( printf "%s\n" "$el" | tr -cd $del )
+                    delta_sum=$( printf "%s + (%s - %s)^2\n" $delta_sum "($el)" $mean | bc -l )
                 done
                 res=$( printf "%s / %s\n" $delta_sum $nargs | bc -l )
                 ;;
@@ -109,7 +111,7 @@ aggregate-selections -params ..1 %{
 
         printf "reg 'r' %s\n" $res
 
-        $( expr "${res}" : '.*\..*' >/dev/null ) && res=$( printf "%.3f" $res | sed -E 's/0+$//' )
+        expr "${res}" : '.*\..*' >/dev/null && res=$( printf "%.3f" $res | sed -E 's/0+$//' )
         printf "info -title 'result (rounded)' '\n%s %+15s'\n" "$prefix" $res
     }
 }
