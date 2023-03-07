@@ -53,7 +53,8 @@ aggregate-selections -params ..1 %{
                     if [ -z $res ]; then
                         res=$( printf "%s\n" "$el" | bc -l )
                     else
-                        [ $( printf "%s > %s\n" "($el)" $res | bc -l ) -eq 1 ] && res=$( printf "%s\n" "$el" | bc -l )
+                        [ $( printf "%s > %s\n" "($el)" $res | bc -l ) -eq 1 ] &&
+                        res=$( printf "%s\n" "$el" | bc -l )
                     fi
                 done
                 ;;
@@ -66,7 +67,8 @@ aggregate-selections -params ..1 %{
                     if [ -z $res ]; then
                         res=$( printf "%s\n" "$el" | bc -l )
                     else
-                        [ $( printf "%s < %s\n" "($el)" $res | bc -l ) -eq 1 ] && res=$( printf "%s\n" "$el" | bc -l )
+                        [ $( printf "%s < %s\n" "($el)" $res | bc -l ) -eq 1 ] &&
+                        res=$( printf "%s\n" "$el" | bc -l )
                     fi
                 done
                 ;;
