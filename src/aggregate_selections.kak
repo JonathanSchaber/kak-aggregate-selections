@@ -12,7 +12,7 @@ aggregate-selections -params ..1 %{
     eval %sh{
         [ $kak_selection_count -eq 1 ] && { echo "fail 'only 1 selection - nothing to aggregate'"; exit 1; }
 
-        del="[\-+*/.0123456789\n]"
+        del="[\-+*/^.0123456789\n]"
 
         case ${1:-sum} in
             sum)
@@ -53,8 +53,8 @@ aggregate-selections -params ..1 %{
                     if [ -z $res ]; then
                         res=$( printf "%s\n" "$el" | bc -l )
                     else
-                        [ $( printf "%s > %s\n" "($el)" $res | bc -l ) -eq 1 ] &&
-                        res=$( printf "%s\n" "$el" | bc -l )
+                        el=$( printf "%s\n" "$el" | bc -l )
+                        [ $( printf "%s > %s\n" $el $res | bc -l ) -eq 1 ] && res=$el
                     fi
                 done
                 ;;
@@ -67,8 +67,8 @@ aggregate-selections -params ..1 %{
                     if [ -z $res ]; then
                         res=$( printf "%s\n" "$el" | bc -l )
                     else
-                        [ $( printf "%s < %s\n" "($el)" $res | bc -l ) -eq 1 ] &&
-                        res=$( printf "%s\n" "$el" | bc -l )
+                        el=$( printf "%s\n" "$el" | bc -l )
+                        [ $( printf "%s < %s\n" $el $res | bc -l ) -eq 1 ] && res=$el
                     fi
                 done
                 ;;
@@ -113,7 +113,7 @@ aggregate-selections -params ..1 %{
 
         printf "reg 'r' %s\n" $res
 
-        expr $res : '.*\..*' >/dev/null && res=$( printf "%.3f" $res | sed -E 's/.?0+$//' )
+        expr $res : '.*\..*' >/dev/null && res=$( printf "%.3f" $res | sed -E 's/\.?0+$//' )
         printf "info -title 'result (rounded)' '\n%s %+15s'\n" "$prefix" $res
     }
 }
