@@ -85,7 +85,7 @@ aggregate-selections -params ..1 %{
                     el=$( printf "%s\n" "$el" | tr -cd $del )
                     delta_sum=$( printf "%s + (%s - %s)^2\n" $delta_sum "($el)" $mean | bc -l )
                 done
-                res=$( printf "%s / %s\n" $delta_sum $nargs | bc -l )
+                res=$( printf "sqrt(%s / %s)\n" $delta_sum $nargs | bc -l )
                 ;;
             var)
                 prefix="variance: "
@@ -111,7 +111,7 @@ aggregate-selections -params ..1 %{
 
         printf "reg 'r' %s\n" $res
 
-        expr "${res}" : '.*\..*' >/dev/null && res=$( printf "%.3f" $res | sed -E 's/0+$//' )
+        expr $res : '.*\..*' >/dev/null && res=$( printf "%.3f" $res | sed -E 's/.?0+$//' )
         printf "info -title 'result (rounded)' '\n%s %+15s'\n" "$prefix" $res
     }
 }
