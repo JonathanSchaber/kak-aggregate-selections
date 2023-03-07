@@ -30,11 +30,11 @@ copy the contents of the file to your `kakrc` directly.
 
 
 [^1]: `aggregate-selections` is implemented to evaluate arithmetic
-expressions inside selections: Thus, a `sum` aggregation on to
-selections A `100` and B `50+50` yields `200`. For `bc` to be able
-to evaluate selected numbers/expressions, `aggregate-selections`
-removes all characters which are **not** a number, a `.`, or one
-of the operators `+`, `-`, `*`, `/`, `^`. Therefore, you don't
-need to pedantically crop your selections or remove 10k-separators
-not processable by `bc` (`,`, `'`, ` ` and the like).
+expressions inside selections: Thus, a `sum` aggregation on two
+selections **A** `100` and **B** `50+50` yields `200`. For `bc` to be
+able to evaluate selected numbers/expressions, `aggregate-selections`
+removes all characters which are **not** a number, a `.`, or one of
+the operators `+`, `-`, `*`, `/`, `^`. Therefore, you don't need
+to pedantically crop your selections or remove 10k-separators not
+processable by `bc` (`,`, `'`, ` ` and the like).
 
