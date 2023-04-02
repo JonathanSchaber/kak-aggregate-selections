@@ -50,15 +50,22 @@ aggregate-selections -params ..1 %{
                 eval set -- "$kak_quoted_selections"
                 nargs=$#
                 is_even=$( printf "%s %% 2\n" $nargs | bc )
+                arr=()
+                for el in "$@"; do
+                    el=$( printf "%s\n" "$el" | tr -cd $not_del )
+                    arr+=( $( printf "%s\n" "($el)" | bc -l ) )
+                done
+                IFS=$'\n' sorted=( $( sort -n <<< ${arr[*]} ) )
+                unset IFS
                 if [ $is_even -eq 0 ]; then
-                    num1=$( printf "(%s / 2) / 1\n" $nargs | bc )
+                    num1=$( printf "(%s / 2) - 1\n" $nargs | bc )
                     num2=$(( $num1 + 1 ))
-                    el1=$( printf "%s\n" "${!num1}" | tr -cd $not_del )
-                    el2=$( printf "%s\n" "${!num2}" | tr -cd $not_del )
+                    el1=${sorted[$num1]}
+                    el2=${sorted[$num2]}
                     res=$( printf "(%s + %s) / 2\n" $el1 $el2 | bc -l )
                 else
-                    num=$( printf "scale=0; ((%s / 2) + 1) / 1\n" $nargs | bc )
-                    res=$( printf "%s\n" "${!num}" | tr -cd $not_del )
+                    num=$( printf "scale=0; (%s / 2) / 1\n" $nargs | bc )
+                    res=${sorted[$num]}
                 fi
                 ;;
             max)
