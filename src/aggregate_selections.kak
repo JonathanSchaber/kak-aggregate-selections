@@ -3,6 +3,7 @@ compute some arithmetic aggregations of the selections
     - sum:  sum
     - prod: product
     - mean: arithmetic mean
+    - med:  median
     - max:  maximum value
     - min:  minimum value
     - stdv: standard deviation
@@ -43,6 +44,22 @@ aggregate-selections -params ..1 %{
                     sum=$( printf "%s + %s\n" $sum "($el)" | bc -l )
                 done
                 res=$( printf "%s / %s\n" $sum $nargs | bc -l )
+                ;;
+            med)
+                prefix="median: "
+                eval set -- "$kak_quoted_selections"
+                nargs=$#
+                is_even=$( printf "%s %% 2\n" $nargs | bc )
+                if [ $is_even -eq 0 ]; then
+                    num1=$( printf "(%s / 2) / 1\n" $nargs | bc )
+                    num2=$(( $num1 + 1 ))
+                    el1=$( printf "%s\n" "${!num1}" | tr -cd $del )
+                    el2=$( printf "%s\n" "${!num2}" | tr -cd $del )
+                    res=$( printf "(%s + %s) / 2\n" $el1 $el2 | bc -l )
+                else
+                    num=$( printf "scale=0; ((%s / 2) + 1) / 1\n" $nargs | bc )
+                    res=${!num}
+                fi
                 ;;
             max)
                 prefix="max: "
@@ -118,7 +135,7 @@ aggregate-selections -params ..1 %{
     }
 }
 
-complete-command -menu aggregate-selections shell-script-candidates %{ printf '%s\n' sum prod mean max min stdv var }
+complete-command -menu aggregate-selections shell-script-candidates %{ printf '%s\n' sum prod mean med max min stdv var }
 
 alias global agg aggregate-selections
 
