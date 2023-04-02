@@ -22,6 +22,10 @@ globally aliased to `agg`.
 The computations are carried out by GNU `bc`, so make sure your shell
 invoked by Kakoune provides this program.
 
+The module has been written to be POSIX compliant, however, the `median`
+aggregation function relays on arrays, so e.g. pure `sh` will not be
+able to compute this one.
+
 
 ## Setup
 
