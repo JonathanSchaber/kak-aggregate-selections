@@ -26,6 +26,7 @@ The module has been written to be POSIX compliant, however, the `median`
 aggregation function relies on the array data structure, Therefore e.g.
 pure `sh` will not be able to compute this one.
 
+[![asciicast](https://asciinema.org/a/e39ESq1VemfVSAJxSdlO60352.png)](https://asciinema.org/a/e39ESq1VemfVSAJxSdlO60352)
 
 ## Setup
 
