@@ -3,6 +3,7 @@ compute some arithmetic aggregations of the selections
     - sum:  sum
     - prod: product
     - mean: arithmetic mean
+    - harm: harmonic mean
     - med:  median
     - max:  maximum value
     - min:  minimum value
@@ -35,7 +36,7 @@ aggregate-selections -params ..1 %{
                 done
                 ;;
             mean)
-                prefix="mean: "
+                prefix="arithmetic mean: "
                 eval set -- "$kak_quoted_selections"
                 nargs=$#
                 sum=0
@@ -44,6 +45,17 @@ aggregate-selections -params ..1 %{
                     sum=$( printf "%s + %s\n" $sum "($el)" | bc -l )
                 done
                 res=$( printf "%s / %s\n" $sum $nargs | bc -l )
+                ;;
+            harm)
+                prefix="harmonic mean: "
+                eval set -- "$kak_quoted_selections"
+                nargs=$#
+                sum=0
+                for el in "$@"; do
+                    el=$( printf "%s\n" "$el" | tr -cd $not_del )
+                    sum=$( printf "%s + 1 / %s\n" $sum "($el)" | bc -l )
+                done
+                res=$( printf "%s / %s\n" $nargs $sum | bc -l )
                 ;;
             med)
                 prefix="median: "
@@ -142,7 +154,7 @@ aggregate-selections -params ..1 %{
     }
 }
 
-complete-command -menu aggregate-selections shell-script-candidates %{ printf '%s\n' sum prod mean med max min stdv var }
+complete-command -menu aggregate-selections shell-script-candidates %{ printf '%s\n' sum prod mean harm med max min stdv var }
 
 alias global agg aggregate-selections
 
